@@ -81,10 +81,10 @@ export default function BinPage() {
               </div>
               <div className="contact-actions">
                 <button onClick={() => handleRestore(contact.id)} className="btn btn-success" title="Restore">
-                  ♻️ Restore
+                  Restore
                 </button>
                 <button onClick={() => handlePermanentDelete(contact.id)} className="btn btn-danger" title="Delete Forever">
-                  💀 Delete
+                   Delete
                 </button>
               </div>
             </div>

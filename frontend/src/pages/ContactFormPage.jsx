@@ -159,7 +159,7 @@ export default function ContactFormPage() {
             borderRadius: '4px',
             marginBottom: '20px'
           }}>
-            <strong>❌ Error:</strong> {error}
+            <strong>Error:</strong> {error}
           </div>
         )}
 
