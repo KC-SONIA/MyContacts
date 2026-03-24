@@ -33,7 +33,7 @@ export default function ContactFormPage() {
           setLastName(contact.lastName || '');
           setBirthday(contact.birthday || '');
           setPhoneNumbers(
-            contact.phoneNumbers.length > 0
+            contact.phoneNumbers.length > 0 
               ? contact.phoneNumbers.map(p => ({ phoneNumber: p.phoneNumber }))
               : [{ phoneNumber: '' }]
           );
@@ -63,13 +63,28 @@ export default function ContactFormPage() {
       return;
     }
 
+    // Validate phone number lengths
+    const invalidPhones = validPhones.filter(p => p.phoneNumber.trim().length < 7);
+    if (invalidPhones.length > 0) {
+      setError('All phone numbers must be at least 7 characters');
+      return;
+    }
+
+    // Validate emails (if any provided)
+    const validEmails = emails.filter(e => e.email.trim());
+    const invalidEmails = validEmails.filter(e => !e.email.includes('@') || !e.email.includes('.'));
+    if (invalidEmails.length > 0) {
+      setError('All email addresses must be valid');
+      return;
+    }
+
     setLoading(true);
     const payload = {
       firstName: firstName.trim(),
       lastName: lastName.trim() || null,
       birthday: birthday || null,
       phoneNumbers: validPhones,
-      emails: emails.filter(e => e.email.trim()),
+      emails: validEmails,
     };
 
     try {
@@ -103,6 +118,22 @@ export default function ContactFormPage() {
     setPhoneNumbers(updated);
   };
 
+  // Helper to validate phone number length
+  const isPhoneNumberValid = (phone) => {
+    const trimmed = phone.trim();
+    return trimmed.length === 0 || trimmed.length == 10;
+  };
+
+  // Get validation message for a phone number
+  const getPhoneValidationMessage = (phone) => {
+    const trimmed = phone.trim();
+    if (trimmed.length === 0) return '';
+    if (trimmed.length < 10) {
+      return `⚠️ Phone number must be at least 10 characters (currently ${trimmed.length})`;
+    }
+    return '✓ Valid';
+  };
+
   // Dynamic email fields
   const addEmail = () => setEmails([...emails, { email: '' }]);
   const removeEmail = (index) => {
@@ -120,7 +151,17 @@ export default function ContactFormPage() {
     <div className="form-page">
       <div className="form-card">
         <h2>{isEdit ? 'Edit Contact' : 'Add New Contact'}</h2>
-        {error && <div className="error-message">{error}</div>}
+        {error && (
+          <div className="error-message" style={{ 
+            backgroundColor: '#ffe6e6', 
+            borderLeft: '4px solid #e74c3c',
+            padding: '12px',
+            borderRadius: '4px',
+            marginBottom: '20px'
+          }}>
+            <strong>❌ Error:</strong> {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <div className="form-row">
@@ -162,16 +203,28 @@ export default function ContactFormPage() {
             <label>Phone Numbers *</label>
             {phoneNumbers.map((phone, index) => (
               <div key={index} className="dynamic-field">
-                <input
-                  type="tel"
-                  value={phone.phoneNumber}
-                  onChange={(e) => updatePhone(index, e.target.value)}
-                  placeholder="+1 234 567 8900"
-                />
-                {phoneNumbers.length > 1 && (
-                  <button type="button" onClick={() => removePhone(index)} className="btn btn-remove">
-                    ✕
-                  </button>
+                <div>
+                  <input
+                    type="tel"
+                    value={phone.phoneNumber}
+                    onChange={(e) => updatePhone(index, e.target.value)}
+                    placeholder="+1 234 567 8900"
+                  />
+                  {phoneNumbers.length > 1 && (
+                    <button type="button" onClick={() => removePhone(index)} className="btn btn-remove">
+                      ✕
+                    </button>
+                  )}
+                </div>
+                {phone.phoneNumber && !isPhoneNumberValid(phone.phoneNumber) && (
+                  <small style={{ color: '#e74c3c', display: 'block', marginTop: '4px' }}>
+                    {getPhoneValidationMessage(phone.phoneNumber)}
+                  </small>
+                )}
+                {phone.phoneNumber && isPhoneNumberValid(phone.phoneNumber) && phone.phoneNumber.trim().length >= 7 && (
+                  <small style={{ color: '#27ae60', display: 'block', marginTop: '4px' }}>
+                    ✓ Valid
+                  </small>
                 )}
               </div>
             ))}

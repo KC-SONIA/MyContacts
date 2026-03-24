@@ -40,7 +40,19 @@ export default function SignupPage() {
           <h1>📇 MyContacts</h1>
           <p>Create your account</p>
         </div>
-        {error && <div className="error-message">{error}</div>}
+        {error && (
+          <div style={{ 
+            backgroundColor: '#ffe6e6', 
+            borderLeft: '4px solid #e74c3c',
+            color: '#c0392b',
+            padding: '12px',
+            borderRadius: '4px',
+            marginBottom: '20px',
+            fontWeight: '500'
+          }}>
+            ❌ {error}
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="username">Username</label>
